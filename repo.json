@@ -1,0 +1,30 @@
+[
+  {
+    "Author": "kimklai",
+    "Name": "Burning Down the House",
+    "Description": "Move around housing items with coordinates and allows you to place anywhere.",
+    "Punchline": "House decorating made easy!",
+    "InternalName": "BDTHPlugin",
+    "AssemblyVersion": "1.6.9",
+    "RepoUrl": "https://github.com/kimklai/BDTHPlugin",
+    "ApplicableVersion": "any",
+    "Tags": [
+      "bdth",
+      "housing",
+      "float",
+      "place",
+      "glitch",
+      "furnishing",
+      "kimklai"
+    ],
+    "DalamudApiLevel": 12,
+    "IconUrl": "https://raw.githubusercontent.com/kimklai/BDTHPlugin/main/icon.png",
+    "IsHide": "False",
+    "IsTestingExclusive": "False",
+    "LastUpdated": 1775453698,
+    "DownloadCount": 0,
+    "DownloadLinkInstall": "https://github.com/kimklai/BDTHPlugin/releases/download/v1.6.9/BDTHPlugin.zip",
+    "DownloadLinkTesting": "https://github.com/kimklai/BDTHPlugin/releases/download/v1.6.9/BDTHPlugin.zip",
+    "DownloadLinkUpdate": "https://github.com/kimklai/BDTHPlugin/releases/download/v1.6.9/BDTHPlugin.zip"
+  }
+]
