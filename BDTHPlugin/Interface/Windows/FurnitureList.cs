@@ -12,7 +12,7 @@ namespace BDTHPlugin.Interface.Windows
     private static PluginMemory Memory => Plugin.GetMemory();
     private static Configuration Configuration => Plugin.GetConfiguration();
 
-    private ulong? lastActiveItem;
+    private ulong? lastActiveObject;
     private byte renderCount;
 
     public FurnitureList() : base("Furnishing List")
@@ -23,14 +23,15 @@ namespace BDTHPlugin.Interface.Windows
     public override void PreDraw()
     {
       // Only allows furnishing list when the housing window is open.
-      // Disallows the ability to open furnishing list outdoors.
-      IsOpen &= Memory.IsHousingOpen() && !Plugin.IsOutdoors();
+      IsOpen &= Memory.IsHousingOpen();
     }
 
     public unsafe override void Draw()
     {
       var fontScale = ImGui.GetIO().FontGlobalScale;
-      var hasActiveItem = Memory.HousingStructure->ActiveItem != null;
+      var activeObject = Memory.GetActiveObject();
+      var activeIndex = Memory.GetHousingObjectSelectedIndex();
+      var activeObjectAddress = activeObject != null ? (ulong)activeObject : (ulong?)null;
 
       SizeConstraints = new WindowSizeConstraints
       {
@@ -55,9 +56,6 @@ namespace BDTHPlugin.Interface.Windows
         return;
 
       var playerPos = Plugin.ClientState.LocalPlayer.Position;
-      // An active item is being selected.
-      // var hasActiveItem = Memory.HousingStructure->ActiveItem != null;
-
       if (ImGui.BeginTable("FurnishingListItems", 3))
       {
         ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 0f);
@@ -94,21 +92,20 @@ namespace BDTHPlugin.Interface.Windows
                 continue;
 
               // The currently selected item.
-              var thisActive = hasActiveItem && items[i].Item == Memory.HousingStructure->ActiveItem;
+              var thisActive = i == activeIndex;
 
               ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0f, 4f));
               if (ImGui.Selectable($"##Item{i}", thisActive, ImGuiSelectableFlags.SpanAllColumns, new(0, 20 * fontScale)))
-                Memory.SelectItem((IntPtr)Memory.HousingStructure, (IntPtr)items[i].Item);
+                Memory.TrySelectItem(items[i]);
               ImGui.PopStyleVar();
 
               if (thisActive)
                 ImGui.SetItemDefaultFocus();
 
               // Scroll if the active item has changed from last time.
-              if (thisActive && lastActiveItem != (ulong)Memory.HousingStructure->ActiveItem)
+              if (thisActive && lastActiveObject != activeObjectAddress)
               {
                 ImGui.SetScrollHereY();
-                Plugin.Log.Info($"{ImGui.GetScrollY()} {ImGui.GetScrollMaxY()}");
               }
 
               ImGui.SameLine();
@@ -127,7 +124,7 @@ namespace BDTHPlugin.Interface.Windows
             }
 
             if (renderCount >= 10)
-              lastActiveItem = (ulong)Memory.HousingStructure->ActiveItem;
+              lastActiveObject = activeObjectAddress;
             if (renderCount != 10)
               renderCount++;
           }

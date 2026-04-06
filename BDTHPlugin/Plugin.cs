@@ -126,7 +126,10 @@ namespace BDTHPlugin
       }
     }
 
-    public unsafe static bool IsOutdoors() => Memory.HousingModule->OutdoorTerritory != null;
+    public unsafe static bool IsOutdoors()
+    {
+      return Memory.IsOutdoors();
+    }
 
     public static bool TryGetFurnishing(uint id, out HousingFurniture furniture) => FurnitureDict.TryGetValue(id, out furniture);
     public static bool TryGetYardObject(uint id, out HousingYardObject furniture) => YardObjectDict.TryGetValue(id, out furniture);
@@ -154,14 +157,6 @@ namespace BDTHPlugin
             if (!Memory.IsHousingOpen())
             {
               Chat.PrintError("Cannot open furnishing list unless housing menu is open.");
-              Ui.Furniture.IsOpen = false;
-              return;
-            }
-
-            // Disallow the ability to open furnishing list outdoors.
-            if (IsOutdoors())
-            {
-              Chat.PrintError("Cannot open furnishing outdoors currently.");
               Ui.Furniture.IsOpen = false;
               return;
             }

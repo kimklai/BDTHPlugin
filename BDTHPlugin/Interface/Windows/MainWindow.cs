@@ -138,7 +138,7 @@ namespace BDTHPlugin.Interface.Windows
       DrawTooltip(
       [
         "Opens a furnishing list that you can use to sort by distance and click to select objects.",
-        "NOTE: Does not currently work outdoors!"
+        "Outdoor support is enabled, but selecting yard objects still needs in-game validation."
       ]);
 
       var autoVisible = Configuration.AutoVisible;

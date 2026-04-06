@@ -31,7 +31,7 @@ namespace BDTHPlugin
     public unsafe LayoutWorld* Layout => (LayoutWorld*)layoutWorldPtr;
     public unsafe HousingStructure* HousingStructure => Layout->HousingStruct;
     public unsafe HousingModule* HousingModule => housingModulePtr != IntPtr.Zero ? (HousingModule*)Marshal.ReadIntPtr(housingModulePtr) : null;
-    public unsafe HousingObjectManager* CurrentManager => HousingModule->GetCurrentManager();
+    public unsafe HousingObjectManager* CurrentManager => GetCurrentManager();
     public unsafe Camera* Camera => &CameraManager.Instance()->GetActiveCamera()->CameraBase.SceneCamera;
 
     public static unsafe AtkUnitBase* HousingLayout => (AtkUnitBase*)Plugin.GameGui.GetAddonByName("HousingLayout", 1);
@@ -205,13 +205,59 @@ namespace BDTHPlugin
       }
     }
 
+    public unsafe HousingObjectManager* GetCurrentManager()
+    {
+      var housingModule = HousingModule;
+      if (housingModule == null)
+        return null;
+
+      return housingModule->GetCurrentManager();
+    }
+
+    public unsafe bool IsOutdoors()
+    {
+      var housingModule = HousingModule;
+      if (housingModule == null)
+        return false;
+
+      if (housingModule->CurrentTerritory != null)
+        return housingModule->CurrentTerritory == housingModule->OutdoorTerritory;
+
+      return housingModule->OutdoorTerritory != null && housingModule->IndoorTerritory == null;
+    }
+
+    public unsafe HousingGameObject* GetActiveObject()
+    {
+      var manager = CurrentManager;
+      if (manager == null)
+        return null;
+
+      return IsOutdoors()
+        ? manager->OutdoorActiveObject
+        : manager->IndoorActiveObject;
+    }
+
+    public unsafe bool TrySelectItem(HousingGameObject item)
+    {
+      if (HousingStructure == null || item.Item == null)
+        return false;
+
+      SelectItem((IntPtr)HousingStructure, (IntPtr)item.Item);
+      return true;
+    }
+
     public unsafe int GetHousingObjectSelectedIndex()
     {
+      var manager = CurrentManager;
+      var activeObject = GetActiveObject();
+      if (manager == null || activeObject == null)
+        return -1;
+
       for (var i = 0; i < 400; i++)
       {
-        if (HousingModule->GetCurrentManager()->Objects[i] == 0)
+        if (manager->Objects[i] == 0)
           continue;
-        if ((ulong)HousingModule->GetCurrentManager()->IndoorActiveObject == HousingModule->GetCurrentManager()->Objects[i])
+        if ((ulong)activeObject == manager->Objects[i])
           return i;
       }
       return -1;
@@ -391,13 +437,14 @@ namespace BDTHPlugin
         return GetFurnishingByDistance(out objects, point);
 
       objects = new List<HousingGameObject>();
+      var manager = CurrentManager;
 
-      if (HousingModule == null || HousingModule->GetCurrentManager() == null || HousingModule->GetCurrentManager()->Objects == null)
+      if (manager == null || manager->Objects == null)
         return false;
 
       for (var i = 0; i < 400; i++)
       {
-        var oPtr = HousingModule->GetCurrentManager()->Objects[i];
+        var oPtr = manager->Objects[i];
         if (oPtr == 0)
           continue;
 
@@ -415,15 +462,16 @@ namespace BDTHPlugin
     public unsafe bool GetFurnishingByDistance(out List<HousingGameObject> objects, Vector3 point)
     {
       objects = [];
+      var manager = CurrentManager;
 
-      if (HousingModule == null || HousingModule->GetCurrentManager() == null || HousingModule->GetCurrentManager()->Objects == null)
+      if (manager == null || manager->Objects == null)
         return false;
 
       var tmpObjects = new List<(HousingGameObject gObj, float distance)>();
       objects = new List<HousingGameObject>();
       for (var i = 0; i < 400; i++)
       {
-        var oPtr = HousingModule->GetCurrentManager()->Objects[i];
+        var oPtr = manager->Objects[i];
         if (oPtr == 0)
           continue;
         var o = *(HousingGameObject*)oPtr;

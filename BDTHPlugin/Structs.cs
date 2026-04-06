@@ -48,7 +48,13 @@ namespace BDTHPlugin
     [FieldOffset(0x10)] public HousingObjectManager* IndoorTerritory;
 
     public HousingObjectManager* GetCurrentManager()
-      => OutdoorTerritory != null ? OutdoorTerritory : IndoorTerritory;
+    {
+      if (CurrentTerritory != null)
+        return CurrentTerritory;
+      if (OutdoorTerritory != null)
+        return OutdoorTerritory;
+      return IndoorTerritory;
+    }
   }
 
   [StructLayout(LayoutKind.Explicit)]
