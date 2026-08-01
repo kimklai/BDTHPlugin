@@ -4,8 +4,8 @@ using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using ImGuiNET;
-using ImGuizmoNET;
+using Dalamud.Bindings.ImGui;
+using Dalamud.Bindings.ImGuizmo;
 using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
@@ -61,6 +61,7 @@ namespace BDTHPlugin
 
       PluginInterface.UiBuilder.Draw += Ui.Draw;
       PluginInterface.UiBuilder.OpenMainUi += OpenMainUI;
+      PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUI;
       Condition.ConditionChange += Condition_ConditionChange;
       Framework.Update += Framework_Update;
     }
@@ -96,6 +97,7 @@ namespace BDTHPlugin
       PluginInterface.UiBuilder.Draw -= Ui.Draw;
 
       PluginInterface.UiBuilder.OpenMainUi -= OpenMainUI;
+      PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUI;
       Condition.ConditionChange -= Condition_ConditionChange;
       Framework.Update -= Framework_Update;
 
@@ -112,6 +114,11 @@ namespace BDTHPlugin
       Ui.Main.IsOpen = true;
     }
 
+    private void OpenConfigUI()
+    {
+      OpenMainUI();
+    }
+
     /// <summary>
     /// Draws icon from game data.
     /// </summary>
@@ -122,7 +129,7 @@ namespace BDTHPlugin
       if (icon < 65000)
       {
         var iconTexture = TextureProvider.GetFromGameIcon(new GameIconLookup(icon));
-        ImGui.Image(iconTexture.GetWrapOrEmpty().ImGuiHandle, size);
+        ImGui.Image(iconTexture.GetWrapOrEmpty().Handle, size);
       }
     }
 

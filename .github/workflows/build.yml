@@ -11,7 +11,7 @@ on:
 
 env:
   PROJECT_NAME: BDTHPlugin
-  DALAMUD_VERSION: 12.0.1.5
+  DALAMUD_VERSION: 13.0.0.16
 
 jobs:
   build:
@@ -28,11 +28,11 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
-      - name: Checkout Dalamud API 12
+      - name: Checkout Dalamud API 13
         run: |
           git clone --branch $env:DALAMUD_VERSION --depth 1 --recurse-submodules https://github.com/goatcorp/Dalamud.git _dalamud
 
-      - name: Build Dalamud API 12 dev files
+      - name: Build Dalamud API 13 dev files
         run: |
           dotnet build .\_dalamud\Dalamud\Dalamud.csproj --configuration Debug
 
